@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Clips GTA" />
+    <meta name="theme-color" content="#0b0f0a" />
+    <link rel="icon" href="data:," />
+    <title>Clips GTA Safari</title>
+    <style>
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2.25rem; }
+      * { box-sizing: border-box; }
+      :root {
+        color-scheme: light dark;
+        --bg: #0b0f0a;
+        --bg2: #11160f;
+        --panel: #171d15;
+        --panel2: #1e261c;
+        --line: #2c382a;
+        --txt: #f2f5ee;
+        --muted: #a9b5a2;
+        --lime: #a3e635;
+        --lime-dk: #1a2405;
+        --cyan: #29c7e8;
+        --red: #ff7a72;
+        --gold: #ffb02e;
+        --field: #0e130d;
+        --shadow: 0 10px 30px rgba(0,0,0,.45);
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #eef2e8;
+          --bg2: #e4ead9;
+          --panel: #ffffff;
+          --panel2: #f4f7ee;
+          --line: #cfdcc4;
+          --txt: #16200f;
+          --muted: #5b6a52;
+          --lime: #65a30d;
+          --lime-dk: #f3ffd6;
+          --cyan: #0284c7;
+          --red: #dc2626;
+          --gold: #d97706;
+          --field: #f7faf2;
+          --shadow: 0 10px 24px rgba(40,60,20,.14);
+        }
+      }
+      html { -webkit-text-size-adjust: 100%; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--txt);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        padding-bottom: calc(2.5rem + env(safe-area-inset-bottom));
+      }
+      .wrap { max-width: 560px; margin: 0 auto; padding: 0 14px; }
+
+      /* ---------- Tabs ---------- */
+      .tabs {
+        position: sticky; top: 0; z-index: 50;
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+      }
+      .tabs-in { max-width: 560px; margin: 0 auto; display: flex; gap: 8px; }
+      .tab {
+        flex: 1; border: 1px solid var(--line); background: var(--panel);
+        color: var(--txt); border-radius: 14px; padding: 10px 4px;
+        font-size: 16px; font-weight: 700; cursor: pointer; min-height: 48px;
+      }
+      .tab.on { background: var(--lime); color: #14200a; border-color: var(--lime); }
+      @media (prefers-color-scheme: light) { .tab.on { color: #fff; } }
+
+      h2 { font-size: 24px; line-height: 1.2; margin: 26px 0 6px; }
+      h3 { font-size: 19px; margin: 0 0 4px; }
+      p.lead { color: var(--muted); margin: 0 0 14px; font-size: 16px; line-height: 1.45; }
+      .card {
+        background: var(--panel); border: 1px solid var(--line);
+        border-radius: 18px; padding: 16px; margin: 0 0 18px; box-shadow: var(--shadow);
+      }
+      .meta { color: var(--muted); font-size: 15px; line-height: 1.5; }
+      .stars { color: var(--gold); letter-spacing: 1px; }
+      .caption { font-size: 16px; line-height: 1.45; margin: 8px 0 0; }
+      .tags { color: var(--cyan); }
+
+      label { display: block; font-weight: 700; font-size: 15px; margin: 14px 0 6px; }
+      label:first-child { margin-top: 0; }
+      input[type="text"], input[type="url"], input[type="number"], select, textarea {
+        width: 100%; background: var(--field); color: var(--txt);
+        border: 1px solid var(--line); border-radius: 12px;
+        padding: 11px 12px; font-size: 16px; font-family: inherit;
+      }
+      textarea { min-height: 64px; resize: vertical; }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; }
+      .row > * { flex: 1 1 140px; }
+      .btn {
+        border: 1px solid var(--line); background: var(--panel2); color: var(--txt);
+        border-radius: 12px; padding: 11px 14px; font-size: 16px; font-weight: 700;
+        cursor: pointer; min-height: 48px;
+      }
+      .btn:active { transform: scale(.98); }
+      .btn-lime { background: var(--lime); border-color: var(--lime); color: #14200a; }
+      @media (prefers-color-scheme: light) { .btn-lime { color: #fff; } }
+      .btn-cyan { background: var(--cyan); border-color: var(--cyan); color: #06222b; }
+      @media (prefers-color-scheme: light) { .btn-cyan { color: #fff; } }
+      .btn-red { color: var(--red); }
+      .btnrow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+      .btnrow .btn { flex: 1 1 auto; }
+      .hidden { display: none !important; }
+      .notice {
+        border: 1px dashed var(--line); border-radius: 12px; padding: 12px 14px;
+        color: var(--muted); font-size: 15px; line-height: 1.5; margin: 0 0 14px;
+      }
+      .ok { color: var(--lime); font-weight: 700; }
+      .err { color: var(--red); font-weight: 700; }
+      .toast {
+        position: fixed; left: 50%; transform: translateX(-50%);
+        bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 99;
+        background: var(--lime); color: #14200a; font-weight: 800; font-size: 15px;
+        padding: 12px 18px; border-radius: 999px; box-shadow: var(--shadow);
+        max-width: 92vw; text-align: center;
+      }
+      @media (prefers-color-scheme: light) { .toast { color: #fff; } }
+
+      /* ---------- Reel 2 en 1 ---------- */
+      .reel-zone { display: flex; justify-content: center; margin: 14px 0 6px; }
+      .frame {
+        position: relative; width: min(300px, 82vw); border-radius: 26px;
+        overflow: hidden; isolation: isolate;
+        box-shadow: 0 0 34px -6px var(--glow, rgba(163,230,53,.55));
+      }
+      .frame::before {
+        content: ""; position: absolute; inset: -60%; z-index: 0;
+        background: conic-gradient(from 0deg, var(--c1), var(--c2), var(--c3), var(--c1));
+        animation: spin var(--spin, 7s) linear infinite;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { .frame::before { animation: none; } }
+      .f-neon   { --c1:#a3e635; --c2:#22d3ee; --c3:#4ade80; --glow: rgba(163,230,53,.55); }
+      .f-arco   { --c1:#f472b6; --c2:#818cf8; --c3:#22d3ee; --glow: rgba(129,140,248,.55); }
+      .f-fuego  { --c1:#f97316; --c2:#ef4444; --c3:#facc15; --glow: rgba(249,115,22,.55); }
+      .f-oceano { --c1:#0ea5e9; --c2:#2563eb; --c3:#2dd4bf; --glow: rgba(14,165,233,.55); }
+      .f-oro    { --c1:#f59e0b; --c2:#fde68a; --c3:#d97706; --glow: rgba(245,158,11,.55); }
+      .f-morado { --c1:#a855f7; --c2:#ec4899; --c3:#6366f1; --glow: rgba(168,85,247,.55); }
+      .spin-rapido { --spin: 3s; } .spin-normal { --spin: 7s; } .spin-lento { --spin: 13s; }
+
+      .reel {
+        position: relative; z-index: 1; margin: 7px; border-radius: 20px;
+        overflow: hidden; background: #000; aspect-ratio: 9 / 16;
+        display: flex; flex-direction: column;
+      }
+      .half { position: relative; flex: 1 1 50%; min-height: 0; overflow: hidden; background: #050505; }
+      .half .scaler { position: absolute; inset: 0; }
+      .pos-centro .scaler { transform: scale(1.12); }
+      .pos-izquierda .scaler { transform: scale(1.22) translateX(4%); }
+      .pos-derecha .scaler { transform: scale(1.22) translateX(-4%); }
+      .pos-cerca .scaler { transform: scale(1.38); }
+      .pos-lejos .scaler { transform: scale(1.02); }
+      .half iframe, .half .yt-slot { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+      .yt-slot { display: flex; align-items: center; justify-content: center; color: #8a8a8a; font-weight: 800; letter-spacing: 2px; font-size: 15px; background: radial-gradient(120% 100% at 50% 0%, #1c2417 0%, #050505 70%); text-align: center; padding: 10px; }
+      .half-tag {
+        position: absolute; top: 8px; left: 8px; z-index: 5;
+        background: rgba(0,0,0,.72); color: #fff; font-size: 12px; font-weight: 800;
+        padding: 5px 10px; border-radius: 999px; letter-spacing: .4px; pointer-events: none;
+      }
+      .half-dur {
+        position: absolute; top: 8px; right: 8px; z-index: 5;
+        background: rgba(0,0,0,.72); color: #fff; font-size: 12px; font-weight: 800;
+        padding: 5px 10px; border-radius: 999px; pointer-events: none;
+      }
+      .moment-band {
+        position: relative; z-index: 5; background: #000; color: #fff;
+        font-size: 13px; font-weight: 700; padding: 7px 12px; pointer-events: none;
+      }
+      .subtitle {
+        position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 6;
+        background: rgba(0,0,0,.78); color: #fff; border-radius: 10px;
+        font-weight: 900; font-size: clamp(17px, 5.4vw, 23px); line-height: 1.15;
+        text-align: center; padding: 9px 10px; text-transform: uppercase;
+        text-shadow: 0 2px 0 #000; pointer-events: none;
+      }
+      .shield { position: absolute; inset: 0; z-index: 4; background: transparent; }
+      .bigplay {
+        position: absolute; z-index: 8; left: 50%; top: 50%; transform: translate(-50%,-50%);
+        width: 76px; height: 76px; border-radius: 50%; border: 0; cursor: pointer;
+        background: var(--lime); color: #14200a; font-size: 30px; line-height: 1;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 8px 26px rgba(0,0,0,.55); min-height: 76px; padding: 0;
+      }
+      .stopbtn {
+        position: absolute; z-index: 9; top: 44px; right: 10px;
+        background: rgba(10,10,10,.85); color: #fff; border: 1px solid rgba(255,255,255,.35);
+        border-radius: 999px; padding: 8px 14px; font-weight: 800; font-size: 14px;
+        cursor: pointer; min-height: 40px;
+      }
+      .hintline { font-size: 14px; color: var(--muted); text-align: center; margin: 8px 0 0; line-height: 1.45; }
+      .queue-item { display: flex; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+      .queue-item:last-child { border-bottom: 0; }
+      .qtime { font-weight: 900; color: var(--lime); white-space: nowrap; }
+      @media (prefers-color-scheme: light) { .qtime { color: var(--lime); } }
+      .thumb { width: 100%; border-radius: 12px; display: block; background: #000; aspect-ratio: 16/9; object-fit: cover; }
+      .vidplayer { position: relative; border-radius: 12px; overflow: hidden; background:#000; aspect-ratio: 16/9; margin-top: 10px; }
+      .vidplayer iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+      ol.steps { margin: 8px 0 0; padding-left: 22px; line-height: 1.65; font-size: 16px; }
+      .editbox { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 4px; }
+      .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+      .seg button {
+        flex: 1 1 auto; border: 1px solid var(--line); background: var(--field); color: var(--txt);
+        border-radius: 10px; padding: 9px 8px; font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px;
+      }
+      .seg button.on { background: var(--lime); border-color: var(--lime); color: #14200a; }
+      @media (prefers-color-scheme: light) { .seg button.on { color: #fff; } }
+    </style>
+  </head>
+  <body>
+    <nav class="tabs" aria-label="Secciones">
+      <div class="tabs-in">
+        <button class="tab on" id="tabbtn-clips" type="button">🎬 Clips <span id="count-clips"></span></button>
+        <button class="tab" id="tabbtn-videos" type="button">📺 Videos <span id="count-videos"></span></button>
+        <button class="tab" id="tabbtn-ajustes" type="button">⚙️ Ajustes</button>
+      </div>
+    </nav>
+
+    <main class="wrap">
+      <!-- ============ CLIPS ============ -->
+      <section id="tab-clips">
+        <h2>En cola — salen en orden, el mejor primero</h2>
+        <p class="lead">Cada clip en la cola tiene su hora: uno cada 30 minutos. Toca un clip para sacarlo de la cola.</p>
+        <div class="card" id="queue-box">
+          <p class="meta" id="queue-empty">La cola está vacía. Aprueba clips con el botón “A la cola”.</p>
+          <div id="queue-list"></div>
+        </div>
+
+        <h2>Borradores — revísalos y aprueba los buenos</h2>
+        <p class="lead">Cada reel es <strong>2 en 1</strong>: el juego arriba y el segundo video abajo, en el mismo momento. Toca ▶ y suena aquí mismo, en Safari, sin salir a YouTube. Edita el título, el inicio y la duración (40 seg a 1:40).</p>
+        <div id="clips-list"></div>
+        <div class="notice" id="clips-empty">Todavía no hay clips. Ve a la pestaña <strong>Videos</strong>, pega el enlace de tu video de GTA y toca “Sacar los mejores clips”.</div>
+
+        <div class="card">
+          <h3>Crear un clip a mano</h3>
+          <label for="m-title">Título</label>
+          <input type="text" id="m-title" placeholder="Ej: La persecución de la comisaría" />
+          <div class="row">
+            <div>
+              <label for="m-video">Video</label>
+              <select id="m-video"></select>
+            </div>
+            <div>
+              <label for="m-start">Empieza en (min:seg)</label>
+              <input type="text" id="m-start" placeholder="09:23" inputmode="numeric" />
+            </div>
+            <div>
+              <label for="m-dur">Duración (seg, 40–100)</label>
+              <input type="number" id="m-dur" min="40" max="100" value="60" />
+            </div>
+          </div>
+          <label for="m-sub">Subtítulo dentro del video (en inglés, lo lee la voz)</label>
+          <input type="text" id="m-sub" placeholder="THE CRAZIEST CHASE!" />
+          <div class="btnrow">
+            <button class="btn btn-lime" id="m-create" type="button">Crear clip</button>
+          </div>
+          <p class="hintline" id="m-msg"></p>
+        </div>
+      </section>
+
+      <!-- ============ VIDEOS ============ -->
+      <section id="tab-videos" class="hidden">
+        <h2>Agrega tu video de YouTube</h2>
+        <p class="lead">Pega el enlace de tu video o en vivo de GTA. El video aparece aquí y de ahí sacas los clips.</p>
+        <div class="card">
+          <label for="v-url">Enlace de YouTube</label>
+          <input type="url" id="v-url" placeholder="https://www.youtube.com/watch?v=…" inputmode="url" />
+          <div class="row">
+            <div>
+              <label for="v-name">Nombre (opcional)</label>
+              <input type="text" id="v-name" placeholder="Ej: Jugando GTA6" />
+            </div>
+            <div>
+              <label for="v-len">Cuánto dura el video (minutos)</label>
+              <input type="number" id="v-len" min="3" max="600" value="40" />
+            </div>
+          </div>
+          <div class="btnrow">
+            <button class="btn btn-lime" id="v-add" type="button">Agregar video</button>
+          </div>
+          <p class="hintline" id="v-msg"></p>
+        </div>
+        <div id="videos-list"></div>
+        <div class="notice" id="videos-empty">Todavía no agregaste ningún video.</div>
+      </section>
+
+      <!-- ============ AJUSTES ============ -->
+      <section id="tab-ajustes" class="hidden">
+        <h2>Ajustes</h2>
+        <div class="card">
+          <label for="s-bottom">Enlace del video de abajo por defecto (tu cámara)</label>
+          <input type="url" id="s-bottom" placeholder="https://www.youtube.com/watch?v=…" inputmode="url" />
+          <p class="hintline" style="text-align:left">Es el video donde sales tú. Los clips nuevos lo usan abajo automáticamente. Si lo dejas vacío, abajo va otro momento del mismo video del juego — el reel siempre sale 2 en 1, nunca vacío.</p>
+
+          <label>Voz de los reels nuevos</label>
+          <div class="seg" id="s-voice">
+            <button type="button" data-voice="narrador" class="on">🗣️ Narrador IA en inglés</button>
+            <button type="button" data-voice="original">🔊 Voz original</button>
+            <button type="button" data-voice="ninguna">🔇 Sin voz</button>
+          </div>
+          <p class="hintline" style="text-align:left">Con el narrador, al darle ▶ la voz lee el subtítulo en inglés en voz alta y el video suena bajito debajo. La voz clonada no está disponible en esta versión: solo narrador IA o tu voz grabada en el video original.</p>
+
+          <label for="s-frame">Marco por defecto</label>
+          <select id="s-frame">
+            <option value="auto">Automático — uno distinto en cada reel</option>
+            <option value="neon">Neón lima-cian</option>
+            <option value="arco">Arcoíris</option>
+            <option value="fuego">Fuego</option>
+            <option value="oceano">Océano</option>
+            <option value="oro">Oro</option>
+            <option value="morado">Morado</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <h3>📱 Pon la app en tu pantalla de inicio</h3>
+          <p class="meta">Estás en Safari, así que sí se puede:</p>
+          <ol class="steps">
+            <li>Toca el botón <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba).</li>
+            <li>Baja y toca <strong>“Añadir a pantalla de inicio”</strong>.</li>
+            <li>Toca <strong>Añadir</strong>. El icono queda en tu inicio como una app.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>Publicar en Facebook</h3>
+          <p class="meta">La cola de esta versión te muestra qué clip sale y a qué hora, cada 30 minutos. La publicación automática se activa cuando conectes tu página nueva de Facebook; mientras tanto, aprueba los clips aquí y súbelos con el texto que trae cada uno (título y descripción ya vienen listos en la tarjeta del clip).</p>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast hidden" id="toast" role="status"></div>
+
+    <script>
+      "use strict";
+      /* ================= Estado (solo en memoria, esta versión no guarda) ================= */
+      var videos = [];   // {id, yt, name, lenSec}
+      var clips = [];    // ver makeClip()
+      var settings = { bottomUrl: "", voice: "narrador", frame: "auto" };
+      var uid = 1;
+
+      var FRAMES = [
+        { id: "neon",   name: "Neón lima-cian" },
+        { id: "arco",   name: "Arcoíris" },
+        { id: "fuego",  name: "Fuego" },
+        { id: "oceano", name: "Océano" },
+        { id: "oro",    name: "Oro" },
+        { id: "morado", name: "Morado" }
+      ];
+      var SPINS = ["normal", "rapido", "lento"];
+      var POSITIONS = [
+        { id: "centro",    name: "en el centro" },
+        { id: "izquierda", name: "a la izquierda" },
+        { id: "derecha",   name: "a la derecha" },
+        { id: "cerca",     name: "más de cerca" },
+        { id: "lejos",     name: "más de lejos" }
+      ];
+      var SPEEDS = [1.05, 1.1, 1.15, 1.2, 1.25, 1.3];
+      var DURS = [45, 55, 58, 65, 68, 71, 80, 95];
+      var TITLES = [
+        "¡El momento más loco!", "Persecución imposible", "¡Se escapó por nada!",
+        "¡Casi lo logra!", "La jugada perfecta", "¡Esto se salió de control!",
+        "El salto imposible", "¡La policía no lo cree!", "Choque de película",
+        "¡Por un pelo!", "La huida perfecta", "¡Eso no se ve todos los días!"
+      ];
+      var SUBS = [
+        "THIS IS INSANE!", "THE CRAZIEST CHASE!", "HE ESCAPED BY NOTHING!",
+        "HE ALMOST DID IT!", "THE PERFECT PLAY!", "THIS GOT OUT OF CONTROL!",
+        "THE IMPOSSIBLE JUMP!", "THE COPS CAN'T BELIEVE IT!", "A MOVIE CRASH!",
+        "THAT WAS SO CLOSE!", "THE PERFECT ESCAPE!", "YOU DON'T SEE THIS EVERY DAY!"
+      ];
+      var VOICE_NAMES = { narrador: "Voz de narrador IA en inglés", original: "Voz original del video", ninguna: "Sin voz (solo sonido del juego)" };
+
+      /* ================= Utilidades ================= */
+      function $(id) { return document.getElementById(id); }
+      function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+      function fmt(sec) { sec = Math.max(0, Math.round(sec)); var m = Math.floor(sec / 60), s = sec % 60; return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s; }
+      function parseTime(str) {
+        if (!str) return null;
+        var parts = String(str).trim().split(":").map(function (x) { return parseInt(x, 10); });
+        if (parts.some(isNaN)) return null;
+        if (parts.length === 1) return parts[0];
+        if (parts.length === 2) return parts[0] * 60 + parts[1];
+        if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+        return null;
+      }
+      function parseYT(url) {
+        if (!url) return null;
+        var m = String(url).match(/(?:youtube\.com\/(?:watch\?[^#]*v=|shorts\/|live\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        return m ? m[1] : null;
+      }
+      function stars(n) { var s = ""; for (var i = 1; i <= 5; i++) s += i <= n ? "★" : "☆"; return s; }
+      function toast(msg) {
+        var t = $("toast"); t.textContent = msg; t.classList.remove("hidden");
+        clearTimeout(toast._h); toast._h = setTimeout(function () { t.classList.add("hidden"); }, 2600);
+      }
+      function frameName(id) { for (var i = 0; i < FRAMES.length; i++) if (FRAMES[i].id === id) return FRAMES[i].name; return id; }
+      function posName(id) { for (var i = 0; i < POSITIONS.length; i++) if (POSITIONS[i].id === id) return POSITIONS[i].name; return id; }
+
+      /* ================= YouTube IFrame API ================= */
+      var ytReady = false, ytFailed = false, pendingInit = [];
+      window.onYouTubeIframeAPIReady = function () {
+        ytReady = true;
+        var p = pendingInit.slice(); pendingInit = [];
+        p.forEach(function (fn) { try { fn(); } catch (e) {} });
+      };
+      (function loadYT() {
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        tag.onerror = function () { ytFailed = true; };
+        document.head.appendChild(tag);
+        setTimeout(function () { if (!ytReady) ytFailed = true; }, 9000);
+      })();
+      function whenYT(fn) { if (ytReady && window.YT && YT.Player) { fn(); } else { pendingInit.push(fn); } }
+
+      /* Registro de reproductores por clip: {top, bottom, playing, timer} */
+      var players = {};
+
+      function createPlayer(slotId, ytId, startSec, muted, onReady) {
+        var slot = document.getElementById(slotId);
+        if (!slot) return null;
+        var holder = document.createElement("div");
+        slot.replaceWith(holder);
+        holder.id = slotId;
+        var player = new YT.Player(holder, {
+          width: "100%", height: "100%",
+          videoId: ytId,
+          playerVars: {
+            start: Math.floor(startSec), playsinline: 1, controls: 0,
+            modestbranding: 1, rel: 0, iv_load_policy: 3, disablekb: 1, fs: 0
+          },
+          events: {
+            onReady: function (ev) {
+              if (muted) { try { ev.target.mute(); } catch (e) {} }
+              try { ev.target.seekTo(startSec, true); ev.target.pauseVideo(); } catch (e) {}
+              if (onReady) onReady(ev.target);
+            },
+            onError: function () {
+              var h = document.querySelector('[data-errfor="' + slotId + '"]');
+              if (h) { h.textContent = "Este video no se pudo cargar aquí. Revisa tu conexión y toca Reintentar."; h.classList.remove("hidden"); }
+            }
+          }
+        });
+        return player;
+      }
+
+      function initClipPlayers(clip, onReady) {
+        var rec = players[clip.id];
+        if (rec && rec.top && rec.bottom) { if (onReady) onReady(rec); return; }
+        rec = players[clip.id] = rec || { top: null, bottom: null, playing: false, timer: null, readyCount: 0 };
+        whenYT(function () {
+          var needTop = !rec.top, needBottom = !rec.bottom;
+          if (!needTop && !needBottom) { if (onReady) onReady(rec); return; }
+          var done = function () {
+            rec.readyCount++;
+            if (rec.readyCount >= (needTop ? 1 : 0) + (needBottom ? 1 : 0)) { if (onReady) onReady(rec); }
+          };
+          if (needTop) {
+            rec.top = createPlayer("yt-top-" + clip.id, clip.yt, clip.start, clip.voice !== "original", done);
+          }
+          if (needBottom) {
+            rec.bottom = createPlayer("yt-bot-" + clip.id, clip.bottomYt, clip.bottomStart, true, done);
+          }
+          if (!needTop && needBottom === false && onReady) onReady(rec);
+        });
+      }
+
+      /* ================= Voz narrador (inglés) ================= */
+      function speakEnglish(text) {
+        try {
+          if (!("speechSynthesis" in window)) return;
+          speechSynthesis.cancel();
+          var u = new SpeechSynthesisUtterance(text.replace(/[!🔥😱]/g, "").trim() || text);
+          u.lang = "en-US"; u.rate = 1.0; u.pitch = 0.95;
+          var voices = speechSynthesis.getVoices();
+          for (var i = 0; i < voices.length; i++) {
+            if (/^en[-_]/i.test(voices[i].lang)) { u.voice = voices[i]; break; }
+          }
+          speechSynthesis.speak(u);
+        } catch (e) {}
+      }
+      if ("speechSynthesis" in window) { try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function () { speechSynthesis.getVoices(); }; } catch (e) {} }
+      function stopSpeak() { try { if ("speechSynthesis" in window) speechSynthesis.cancel(); } catch (e) {} }
+
+      /* ================= Reproducción del reel ================= */
+      function setPlayingUI(clip, playing) {
+        var play = document.querySelector('[data-play="' + clip.id + '"]');
+        var stop = document.querySelector('[data-stop="' + clip.id + '"]');
+        var hint = document.querySelector('[data-hint="' + clip.id + '"]');
+        if (play) play.classList.toggle("hidden", playing);
+        if (stop) stop.classList.toggle("hidden", !playing);
+        if (hint && playing) hint.textContent = "Sonando aquí mismo: solo su pedazo " + fmt(clip.start) + " → " + fmt(clip.start + clip.dur) + ", arriba y abajo a la vez.";
+      }
+
+      function playClip(id) {
+        var clip = findClip(id); if (!clip) return;
+        stopAllClips(clip.id);
+        if (ytFailed && !ytReady) {
+          var h = document.querySelector('[data-hint="' + id + '"]');
+          if (h) h.innerHTML = '<span class="err">No cargó el reproductor.</span> Revisa tu conexión a internet y vuelve a tocar ▶.';
+          return;
+        }
+        setPlayingUI(clip, true);
+        initClipPlayers(clip, function (rec) {
+          if (!rec.top) { setPlayingUI(clip, false); return; }
+          try {
+            if (clip.voice === "original") { rec.top.unMute(); rec.top.setVolume(100); } else { rec.top.mute(); }
+            rec.bottom.mute();
+            rec.top.seekTo(clip.start, true);
+            if (rec.bottom) rec.bottom.seekTo(clip.bottomStart, true);
+            try { rec.top.setPlaybackRate(clip.speed); } catch (e) {}
+            try { if (rec.bottom) rec.bottom.setPlaybackRate(clip.speed); } catch (e) {}
+            rec.top.playVideo();
+            if (rec.bottom) rec.bottom.playVideo();
+          } catch (e) {}
+          rec.playing = true;
+          if (clip.voice === "narrador") speakEnglish(clip.sub);
+          clearInterval(rec.timer);
+          rec.timer = setInterval(function () {
+            var t = 0;
+            try { t = rec.top.getCurrentTime(); } catch (e) {}
+            if (t >= clip.start + clip.dur - 0.25) stopClip(id);
+          }, 400);
+        });
+      }
+
+      function stopClip(id) {
+        var rec = players[id]; if (!rec) return;
+        clearInterval(rec.timer); rec.timer = null; rec.playing = false;
+        try { if (rec.top) rec.top.pauseVideo(); } catch (e) {}
+        try { if (rec.bottom) rec.bottom.pauseVideo(); } catch (e) {}
+        stopSpeak();
+        var clip = findClip(id); if (clip) setPlayingUI(clip, false);
+      }
+      function stopAllClips(exceptId) {
+        Object.keys(players).forEach(function (k) { if (String(k) !== String(exceptId)) stopClip(k); });
+        if (exceptId == null) stopSpeak();
+      }
+
+      /* ================= Datos ================= */
+      function findVideo(id) { for (var i = 0; i < videos.length; i++) if (videos[i].id === id) return videos[i]; return null; }
+      function findClip(id) { for (var i = 0; i < clips.length; i++) if (clips[i].id === id) return clips[i]; return null; }
+
+      function bottomFor(video, startSec) {
+        var bid = parseYT(settings.bottomUrl);
+        if (bid && bid !== video.yt) return { yt: bid, start: startSec };
+        // Sin video de cámara: otro momento del mismo video, lejos del momento del clip.
+        var alt = startSec + Math.floor(video.lenSec / 2);
+        if (alt + 60 > video.lenSec) alt = Math.max(0, startSec - Math.floor(video.lenSec / 2));
+        return { yt: video.yt, start: alt };
+      }
+
+      function comboUsed(video, start, frame, pos, speed, ignoreId) {
+        return clips.some(function (c) {
+          return c.id !== ignoreId && c.videoId === video.id &&
+            (c.start === start || (c.frame === frame && c.pos === pos && c.speed === speed));
+        });
+      }
+
+      function makeClip(video, start, dur, idx) {
+        var frame = settings.frame !== "auto" ? settings.frame : FRAMES[idx % FRAMES.length].id;
+        var pos = POSITIONS[idx % POSITIONS.length].id;
+        var speed = SPEEDS[idx % SPEEDS.length];
+        var spin = SPINS[idx % SPINS.length];
+        var tries = 0;
+        while (comboUsed(video, start, frame, pos, speed, -1) && tries < 12) {
+          idx++; tries++;
+          frame = FRAMES[idx % FRAMES.length].id;
+          pos = POSITIONS[idx % POSITIONS.length].id;
+          speed = SPEEDS[idx % SPEEDS.length];
+          spin = SPINS[idx % SPINS.length];
+        }
+        var b = bottomFor(video, start);
+        return {
+          id: uid++, videoId: video.id, yt: video.yt, videoName: video.name,
+          title: TITLES[idx % TITLES.length], sub: SUBS[idx % SUBS.length],
+          start: start, dur: dur, rating: 5 - (idx % 3 === 2 ? 1 : 0),
+          frame: frame, spin: spin, pos: pos, speed: speed,
+          voice: settings.voice, bottomYt: b.yt, bottomStart: b.start,
+          inQueue: false, ready: false
+        };
+      }
+
+      function generateClips(video, count) {
+        var used = {};
+        clips.forEach(function (c) { if (c.videoId === video.id) used[c.start] = true; });
+        var made = [];
+        var usable = Math.max(120, video.lenSec - 110);
+        var slots = Math.max(count * 3, 12);
+        for (var s = 0; s < slots && made.length < count; s++) {
+          var start = Math.floor(30 + (usable - 30) * (s + 0.5) / slots + ((s * 37) % 41));
+          start = Math.min(start, video.lenSec - 115);
+          if (start < 0) start = 0;
+          if (used[start]) continue;
+          // Evita momentos pegados a uno ya usado (menos de 90 seg de distancia)
+          var clash = Object.keys(used).some(function (k) { return Math.abs(Number(k) - start) < 90; });
+          if (clash) continue;
+          used[start] = true;
+          var idx = clips.length + made.length;
+          var dur = DURS[(idx + s) % DURS.length];
+          if (start + dur > video.lenSec) dur = Math.max(40, video.lenSec - start);
+          made.push(makeClip(video, start, dur, idx));
+        }
+        return made;
+      }
+
+      function captionOf(clip) {
+        return clip.videoName + " — parte " + (clip.part || 1) + ". Mira hasta el final 🔥 #GTA #GTAV #Gaming #Reels";
+      }
+
+      /* ================= Render ================= */
+      function reelHTML(clip) {
+        var botTag = clip.bottomYt === clip.yt ? "🎮 EL JUEGO · OTRO MOMENTO" : "🎤 TÚ";
+        return '' +
+        '<div class="reel-zone"><div class="frame f-' + clip.frame + ' spin-' + clip.spin + '" data-frame="' + clip.id + '">' +
+          '<div class="reel pos-' + clip.pos + '" data-reel="' + clip.id + '">' +
+            '<div class="half">' +
+              '<span class="half-tag">🎮 EL JUEGO</span><span class="half-dur">' + clip.dur + ' seg</span>' +
+              '<div class="scaler"><div class="yt-slot" id="yt-top-' + clip.id + '">GTA<br>▶</div></div>' +
+              '<div class="shield" data-shield="' + clip.id + '"></div>' +
+            '</div>' +
+            '<div class="moment-band">⏱️ Su momento: ' + fmt(clip.start) + ' → ' + fmt(clip.start + clip.dur) + ' · ' + clip.speed.toFixed(2) + '×</div>' +
+            '<div class="half">' +
+              '<span class="half-tag">' + botTag + '</span>' +
+              '<div class="scaler"><div class="yt-slot" id="yt-bot-' + clip.id + '">GTA<br>▶</div></div>' +
+              '<div class="shield" data-shield="' + clip.id + '"></div>' +
+              '<div class="subtitle" data-sub="' + clip.id + '">' + esc(clip.sub) + '</div>' +
+            '</div>' +
+            '<button class="bigplay" type="button" data-play="' + clip.id + '" aria-label="Reproducir el reel">▶</button>' +
+            '<button class="stopbtn hidden" type="button" data-stop="' + clip.id + '">⏹️ Detener</button>' +
+          '</div>' +
+        '</div></div>' +
+        '<p class="hintline hidden" data-errfor="yt-top-' + clip.id + '"></p>' +
+        '<p class="hintline" data-hint="' + clip.id + '">Toca ▶ y suena aquí mismo, solo su pedazo del video, arriba y abajo a la vez, sin salir a YouTube.</p>';
+      }
+
+      function clipCardHTML(clip) {
+        var v = findVideo(clip.videoId);
+        return '<article class="card" data-card="' + clip.id + '">' +
+          '<h3>' + esc(clip.title) + '</h3>' +
+          '<div class="meta">' + clip.dur + ' seg · empieza ' + fmt(clip.start) + ' · <span class="stars">' + stars(clip.rating) + '</span> · 2 en 1 — juego arriba, tú abajo<br>De: ' + esc(clip.videoName) + '</div>' +
+          '<p class="caption">' + esc(captionOf(clip)) + '</p>' +
+          reelHTML(clip) +
+          '<p class="meta">Así va a salir este reel: 2 en 1 · marco ' + esc(frameName(clip.frame).toLowerCase()) + ' moviéndose (' + clip.spin + ') · con su subtítulo dentro del video · ' + esc(VOICE_NAMES[clip.voice].toLowerCase()) + ' · video ' + esc(posName(clip.pos)) + ' y un chin más rápido (' + clip.speed.toFixed(2) + '×).</p>' +
+          '<div class="btnrow">' +
+            (clip.inQueue
+              ? '<button class="btn" type="button" data-act="unqueue" data-id="' + clip.id + '">Quitar de la cola</button>'
+              : '<button class="btn btn-lime" type="button" data-act="queue" data-id="' + clip.id + '">✓ A la cola</button>') +
+            '<button class="btn" type="button" data-act="edit" data-id="' + clip.id + '">✏️ Editar</button>' +
+            '<button class="btn" type="button" data-act="ready" data-id="' + clip.id + '">' + (clip.ready ? "✓ Listo" : "Marcar listo") + '</button>' +
+            '<button class="btn btn-red" type="button" data-act="del" data-id="' + clip.id + '">Borrar</button>' +
+          '</div>' +
+          '<div class="editbox hidden" data-edit="' + clip.id + '">' +
+            '<label>Título</label><input type="text" data-f="title" value="' + esc(clip.title) + '">' +
+            '<label>Subtítulo dentro del video (la voz lo lee en inglés)</label><input type="text" data-f="sub" value="' + esc(clip.sub) + '">' +
+            '<div class="row"><div><label>Empieza en (min:seg)</label><input type="text" data-f="start" value="' + fmt(clip.start) + '" inputmode="numeric"></div>' +
+            '<div><label>Duración (seg, 40–100)</label><input type="number" data-f="dur" min="40" max="100" value="' + clip.dur + '"></div></div>' +
+            '<label>Enlace del video de abajo (tu cámara)</label><input type="url" data-f="bottom" value="' + (clip.bottomYt === clip.yt ? "" : "https://www.youtube.com/watch?v=" + clip.bottomYt) + '" placeholder="Pega aquí el enlace donde sales tú">' +
+            '<div class="row"><div><label>Marco de colores</label><select data-f="frame">' +
+              FRAMES.map(function (f) { return '<option value="' + f.id + '"' + (f.id === clip.frame ? " selected" : "") + '>' + f.name + '</option>'; }).join("") +
+            '</select></div>' +
+            '<div><label>El marco se mueve</label><select data-f="spin">' +
+              [["normal", "Normal"], ["rapido", "Rápido"], ["lento", "Lento"]].map(function (s) { return '<option value="' + s[0] + '"' + (s[0] === clip.spin ? " selected" : "") + '>' + s[1] + '</option>'; }).join("") +
+            '</select></div></div>' +
+            '<div class="row"><div><label>Posición del video</label><select data-f="pos">' +
+              POSITIONS.map(function (p) { return '<option value="' + p.id + '"' + (p.id === clip.pos ? " selected" : "") + '>' + p.name + '</option>'; }).join("") +
+            '</select></div>' +
+            '<div><label>Velocidad</label><select data-f="speed">' +
+              SPEEDS.map(function (s) { return '<option value="' + s + '"' + (s === clip.speed ? " selected" : "") + '>' + s.toFixed(2) + '×</option>'; }).join("") +
+            '</select></div></div>' +
+            '<label>Voz</label><div class="seg" data-f="voice">' +
+              Object.keys(VOICE_NAMES).map(function (k) { return '<button type="button" data-v="' + k + '"' + (k === clip.voice ? ' class="on"' : "") + '>' + VOICE_NAMES[k].replace("Voz de ", "").replace("Voz ", "") + '</button>'; }).join("") +
+            '</div>' +
+            '<div class="btnrow"><button class="btn btn-lime" type="button" data-act="save" data-id="' + clip.id + '">Guardar cambios</button></div>' +
+            '<p class="hintline" data-editmsg="' + clip.id + '"></p>' +
+          '</div>' +
+        '</article>';
+      }
+
+      function renderClips() {
+        var list = $("clips-list");
+        list.innerHTML = clips.map(clipCardHTML).join("");
+        $("clips-empty").classList.toggle("hidden", clips.length > 0);
+        $("count-clips").textContent = clips.length ? "(" + clips.length + ")" : "";
+        // Inicializa los reproductores cuando la tarjeta se ve en pantalla (para que se vea el video, no una caja vacía)
+        if ("IntersectionObserver" in window) {
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+              if (en.isIntersecting) {
+                var id = Number(en.target.getAttribute("data-card"));
+                var c = findClip(id);
+                if (c) initClipPlayers(c, null);
+                io.unobserve(en.target);
+              }
+            });
+          }, { rootMargin: "200px" });
+          list.querySelectorAll("[data-card]").forEach(function (el) { io.observe(el); });
+        }
+        renderQueue();
+      }
+
+      function nextSlot(from) {
+        var d = new Date(from.getTime());
+        d.setSeconds(0, 0);
+        var add = 30 - (d.getMinutes() % 30);
+        if (add === 0) add = 30;
+        d.setMinutes(d.getMinutes() + add);
+        return d;
+      }
+      function renderQueue() {
+        var q = clips.filter(function (c) { return c.inQueue; })
+                     .slice().sort(function (a, b) { return b.rating - a.rating || a.id - b.id; });
+        $("queue-empty").classList.toggle("hidden", q.length > 0);
+        var t = nextSlot(new Date());
+        $("queue-list").innerHTML = q.map(function (c, i) {
+          var when = new Date(t.getTime() + i * 30 * 60000);
+          var hh = when.getHours(), mm = when.getMinutes();
+          var ampm = hh >= 12 ? "p. m." : "a. m."; hh = hh % 12; if (hh === 0) hh = 12;
+          var label = hh + ":" + (mm < 10 ? "0" : "") + mm + " " + ampm;
+          return '<div class="queue-item"><span class="qtime">' + label + '</span><span><strong>' + esc(c.title) + '</strong> <span class="meta">· ' + c.dur + ' seg · ' + fmt(c.start) + ' → ' + fmt(c.start + c.dur) + '</span></span></div>';
+        }).join("");
+      }
+
+      function renderVideos() {
+        $("count-videos").textContent = videos.length ? "(" + videos.length + ")" : "";
+        $("videos-empty").classList.toggle("hidden", videos.length > 0);
+        $("videos-list").innerHTML = videos.map(function (v) {
+          var mine = clips.filter(function (c) { return c.videoId === v.id; }).length;
+          return '<article class="card">' +
+            '<h3>' + esc(v.name) + '</h3>' +
+            '<div class="meta">Duración: ' + Math.round(v.lenSec / 60) + ' min · Clips sacados de este video: ' + mine + '</div>' +
+            '<div class="vidplayer"><iframe src="https://www.youtube-nocookie.com/embed/' + v.yt + '?playsinline=1&rel=0" title="' + esc(v.name) + '" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>' +
+            '<div class="row" style="margin-top:12px"><div><label>¿Cuántos clips quieres sacar?</label><input type="number" min="1" max="12" value="4" data-count="' + v.id + '"></div></div>' +
+            '<div class="btnrow">' +
+              '<button class="btn btn-lime" type="button" data-act="gen" data-id="' + v.id + '">🎬 Sacar los mejores clips</button>' +
+              '<button class="btn btn-red" type="button" data-act="delvideo" data-id="' + v.id + '">Quitar video</button>' +
+            '</div>' +
+            '<p class="hintline" data-genmsg="' + v.id + '"></p>' +
+          '</article>';
+        }).join("");
+        var sel = $("m-video");
+        sel.innerHTML = videos.length
+          ? videos.map(function (v) { return '<option value="' + v.id + '">' + esc(v.name) + '</option>'; }).join("")
+          : '<option value="">Primero agrega un video</option>';
+      }
+
+      function renderAll() { renderVideos(); renderClips(); }
+
+      /* ================= Acciones ================= */
+      function switchTab(name) {
+        ["clips", "videos", "ajustes"].forEach(function (t) {
+          $("tab-" + t).classList.toggle("hidden", t !== name);
+          $("tabbtn-" + t).classList.toggle("on", t === name);
+        });
+        stopAllClips(null);
+        window.scrollTo({ top: 0 });
+      }
+      $("tabbtn-clips").addEventListener("click", function () { switchTab("clips"); });
+      $("tabbtn-videos").addEventListener("click", function () { switchTab("videos"); });
+      $("tabbtn-ajustes").addEventListener("click", function () { switchTab("ajustes"); });
+
+      $("v-add").addEventListener("click", function () {
+        var url = $("v-url").value.trim();
+        var yt = parseYT(url);
+        var msg = $("v-msg");
+        if (!yt) { msg.innerHTML = '<span class="err">Ese enlace no es de YouTube.</span> Copia el enlace completo del video y pégalo aquí.'; return; }
+        if (videos.some(function (v) { return v.yt === yt; })) { msg.innerHTML = '<span class="err">Ese video ya está agregado.</span>'; return; }
+        var mins = parseInt($("v-len").value, 10);
+        if (isNaN(mins) || mins < 3) mins = 40;
+        var name = $("v-name").value.trim() || "Jugando GTA";
+        videos.push({ id: uid++, yt: yt, name: name, lenSec: mins * 60 });
+        $("v-url").value = ""; $("v-name").value = "";
+        msg.innerHTML = '<span class="ok">Video agregado.</span> Ahora saca los clips aquí abajo.';
+        renderVideos();
+        toast("Video agregado ✅");
+      });
+
+      $("m-create").addEventListener("click", function () {
+        var msg = $("m-msg");
+        var v = findVideo(Number($("m-video").value));
+        if (!v) { msg.innerHTML = '<span class="err">Primero agrega un video en la pestaña Videos.</span>'; return; }
+        var start = parseTime($("m-start").value);
+        if (start === null) { msg.innerHTML = '<span class="err">Escribe el inicio como min:seg, ej. 09:23.</span>'; return; }
+        var dur = parseInt($("m-dur").value, 10);
+        if (isNaN(dur)) dur = 60;
+        dur = Math.min(100, Math.max(40, dur));
+        if (clips.some(function (c) { return c.videoId === v.id && c.start === start; })) {
+          msg.innerHTML = '<span class="err">Ya hay un clip en ese mismo momento.</span> Cambia el inicio: todos los reels tienen que ser diferentes.'; return;
+        }
+        var c = makeClip(v, start, dur, clips.length);
+        if ($("m-title").value.trim()) c.title = $("m-title").value.trim();
+        if ($("m-sub").value.trim()) c.sub = $("m-sub").value.trim();
+        c.part = clips.filter(function (x) { return x.videoId === v.id; }).length + 1;
+        clips.push(c);
+        $("m-title").value = ""; $("m-sub").value = ""; $("m-start").value = "";
+        msg.innerHTML = '<span class="ok">Clip creado.</span> Está en los borradores, arriba.';
+        renderClips();
+        switchTab("clips");
+        toast("Clip creado ✅");
+      });
+
+      document.addEventListener("click", function (ev) {
+        var play = ev.target.closest("[data-play]");
+        if (play) { playClip(Number(play.getAttribute("data-play"))); return; }
+        var stop = ev.target.closest("[data-stop]");
+        if (stop) { stopClip(stop.getAttribute("data-stop")); return; }
+        var shield = ev.target.closest("[data-shield]");
+        if (shield) {
+          var sid = shield.getAttribute("data-shield");
+          var rec = players[sid];
+          if (rec && rec.playing) stopClip(sid); else playClip(Number(sid));
+          return;
+        }
+        var vbtn = ev.target.closest('[data-f="voice"] button');
+        if (vbtn) {
+          var seg = vbtn.parentElement;
+          seg.querySelectorAll("button").forEach(function (b) { b.classList.toggle("on", b === vbtn); });
+          return;
+        }
+        var t = ev.target.closest("[data-act]");
+        if (!t) return;
+        var act = t.getAttribute("data-act"), id = Number(t.getAttribute("data-id"));
+
+        if (act === "gen") {
+          var v = findVideo(id); if (!v) return;
+          var inp = document.querySelector('[data-count="' + id + '"]');
+          var n = parseInt(inp && inp.value, 10);
+          if (isNaN(n)) n = 4;
+          n = Math.min(12, Math.max(1, n));
+          var made = generateClips(v, n);
+          var gm = document.querySelector('[data-genmsg="' + id + '"]');
+          if (!made.length) {
+            if (gm) gm.innerHTML = '<span class="err">Ya no quedan momentos nuevos en este video.</span> Todos los clips tienen que ser diferentes; agrega otro video o borra clips viejos.';
+            return;
+          }
+          var base = clips.filter(function (c) { return c.videoId === v.id; }).length;
+          made.forEach(function (c, i) { c.part = base + i + 1; clips.push(c); });
+          renderAll();
+          switchTab("clips");
+          toast(made.length + (made.length === 1 ? " clip nuevo ✅" : " clips nuevos ✅"));
+          return;
+        }
+        if (act === "delvideo") {
+          stopAllClips(null);
+          videos = videos.filter(function (x) { return x.id !== id; });
+          clips = clips.filter(function (x) { return x.videoId !== id; });
+          Object.keys(players).forEach(function (k) { delete players[k]; });
+          renderAll();
+          toast("Video quitado");
+          return;
+        }
+        var clip = findClip(id); if (!clip) return;
+        if (act === "queue") { clip.inQueue = true; renderClips(); toast("A la cola ✅ Sale cada 30 min"); }
+        if (act === "unqueue") { clip.inQueue = false; renderClips(); }
+        if (act === "ready") { clip.ready = !clip.ready; renderClips(); }
+        if (act === "del") { stopClip(String(id)); delete players[id]; clips = clips.filter(function (x) { return x.id !== id; }); renderClips(); toast("Clip borrado"); }
+        if (act === "edit") {
+          var box = document.querySelector('[data-edit="' + id + '"]');
+          if (box) box.classList.toggle("hidden");
+        }
+        if (act === "save") {
+          var box2 = document.querySelector('[data-edit="' + id + '"]');
+          var get = function (f) { var el = box2.querySelector('[data-f="' + f + '"]'); return el ? el.value : ""; };
+          var newStart = parseTime(get("start"));
+          var em = document.querySelector('[data-editmsg="' + id + '"]');
+          if (newStart === null) { if (em) em.innerHTML = '<span class="err">El inicio va como min:seg, ej. 09:23.</span>'; return; }
+          if (clips.some(function (c) { return c.id !== id && c.videoId === clip.videoId && c.start === newStart; })) {
+            if (em) em.innerHTML = '<span class="err">Ya hay otro clip en ese momento.</span> Todos los reels tienen que ser diferentes.'; return;
+          }
+          stopClip(String(id));
+          clip.title = get("title").trim() || clip.title;
+          clip.sub = get("sub").trim() || clip.sub;
+          clip.start = newStart;
+          var d = parseInt(get("dur"), 10); if (!isNaN(d)) clip.dur = Math.min(100, Math.max(40, d));
+          var bUrl = get("bottom").trim();
+          var bid = parseYT(bUrl);
+          if (bid) { clip.bottomYt = bid; clip.bottomStart = clip.start; }
+          else if (!bUrl) { var vv = findVideo(clip.videoId); if (vv) { var bb = bottomFor(vv, clip.start); clip.bottomYt = bb.yt; clip.bottomStart = bb.start; } }
+          clip.frame = get("frame"); clip.spin = get("spin"); clip.pos = get("pos");
+          clip.speed = parseFloat(get("speed")) || clip.speed;
+          var onBtn = box2.querySelector('[data-f="voice"] button.on');
+          if (onBtn) clip.voice = onBtn.getAttribute("data-v");
+          delete players[id];
+          renderClips();
+          toast("Cambios guardados ✅");
+        }
+      });
+
+      /* Ajustes */
+      $("s-bottom").addEventListener("change", function () { settings.bottomUrl = this.value.trim(); toast("Video de abajo guardado para los clips nuevos"); });
+      $("s-frame").addEventListener("change", function () { settings.frame = this.value; });
+      $("s-voice").addEventListener("click", function (ev) {
+        var b = ev.target.closest("[data-voice]"); if (!b) return;
+        settings.voice = b.getAttribute("data-voice");
+        this.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); });
+      });
+
+      renderAll();
+    </script>
+  </body>
+</html>
